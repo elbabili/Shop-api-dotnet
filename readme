@@ -1,0 +1,148 @@
+Approche ici par convention plutot que par configuration aussi il faut respecter scrupuleusement les conventions pour que cela fonctionne
+nb : Ce projet m'a aussi servi de laboratoire de test de différentes fonctionnalités du framework
+
+Il s'agit ici d'une appli web aussi voici la commande : dotnet new web -o NomApp
+
+Après avoir crée l'appli web puis suivre étape 1 et 2 dans Startup.cs
+
+3 ajouter un ou plusieurs controleurs en créant un rep à la racine du projet
+    ->ajouter un controleur TestController.cs 
+        ->ajouter une méthode nommé Index qui renvoi la vue correspondante
+
+4 ajouter une ou plusieurs vues en créant un rep ...
+    ->ajouter un dossier Test ---> toutes les vues du controleur TestController doivent se trouver ici
+        ->ajouter-y un fichier Index.cshtml
+
+5 tester http://localhost:5000/Test/Index affiche le contenu de la page Index.cshtml
+
+6 Dans notre controleur TestController
+        ->ajouter une nouvelle méthode qui renvoi une autre vue, puis une autre autant que necessaire... tester !
+
+NB : Ajouter extension pour la bonne gestion du langage cs + razor+
+
+7 ajouter un model dans le controller pour l'utiliser dans les vues
+
+8 ajouter une page template nécessite d'ajouter un rep shared dans Views
+    -> ajouter un fichier _Layout.cshtml
+    -> ensuite intégrer cette page template dans les vues désirées -> Layout = "_Layout";
+    -> il est possible de récupérer du code existant pour compléter la page template avec une barre de navigation..
+
+9 dans le dossier statique cad wwwroot ajouter un rep css dans lequel coller bootstrap puis ajouter le link dans la page template par ex
+
+10 ajouter dans le rep Model une class Student par ex avec des propriétés puis à l'aide du controller renvoyer une liste d'étudiants
+    -> dans la vue List, injecter la page template puis ajouter le lien vers le model via le controleur @model... et afficher les étudiants
+
+11 Pour injecter la page template systhématiquement sans avoir à l'écrire
+    -> commencer par supprimer dans les vues @{ Layout = "_Layout"; }
+    -> ajouter dans le rep Views un fichier _ViewStarts.cshtml
+
+NB : ce tuto from sratch est à privilégier pour apprendre mais il est possible de générer une appli avec tous ces éléments automatiquement :
+        au lieu de web comme ici utiliser mvc -> dotnet new mvc -o nomApp
+
+12 utilisation de entity framework pour gérer une base de donnée
+    -> il faut ajouter les dépendances vers EntityFrameworkCore dans le fichier WebApp.csproj (recherche sur dotnet add package entityframeworkcore / nuget)
+        -> executer : dotnet add package Microsoft.EntityFrameworkCore --version 3.1.3
+        -> executer : dotnet add package Microsoft.EntityFrameworkCore.InMemory --version 3.1.3     (ajouter d'un sgbd virtuel)
+    -> il faut ajouter le service dans le fichier Startup (12 bis)
+    -> ajouter la classe (MyDbContext) qui permettra de faire le mapping objet relationnel en respectant scrupuleusement les conventions
+        -> il est possible d'utiliser les annotations sur la classe Student pour donner un nom de table différent...
+
+13 création d'une api rest pour ajouter modifier les students
+    -> créer une classe StudentsRestService qui hérite de Controller (controleur Rest <> controleur mvc)
+    -> ajouter le mecanisme des annotations
+    -> ajouter vos méthodes CRUD
+
+14 Ajouter des classes pour un besoin spécifique ici : appli shop
+    -> Ajouter les entités et réaliser le mapping objet relationnel en utilisant le modele ou stratégie code first qui intègre 
+    les 2 autres, c'est surtout l'approche des développeurs
+    - model first -> dessiner le diagramme qui va générer la bdd et le code nécessite un min de connaissances en architecture
+    - db first    -> crée la base de donnée qui générèrera le code avec les entités qu'il suffira d'exploiter
+
+15 Configurer pour utiliser une vraie base de donnée ici mariadb/mysql
+    -> dotnet add package Pomelo.EntityFrameworkCore.MySql --version 3.1.1
+    -> redefinir la méthode OnConfiguring dans MyDbContext
+    -> dans le point d'entrée de l'appli Program.cs/main ajouter des insertions en base pour tester
+    -> Utiliser un fichier de config pour les infos de connexion : appsettings.json
+
+16 [ToDO : finir puis tester] Ajouter un controleur de gestion des catégories : CategoryController
+    -> ajouter les vues associées notamment pour afficher la liste des catégories
+    -> puis la liste des produits par catégories (responsive...)
+    -> ajouter dans le _Layout(Shared) le renvoi vers le controleur category au clic donc pour afficher :
+        -> la liste des catégories
+        -> la liste des produits par catégories
+
+nb : possibilitée d'utiliser les helpers ou webforms notamment pour le formulaire 
+
+17 Ajouter un controller Rest dans le rep web pour les produits (CRUD) : ProductsRestController
+
+18 Ajouter un controller Rest dans le rep web pour les catégories (CRUD) : CategoriesRestController
+
+19 S'agissant des problèmes Cors il faut :
+    -> installer le package qui va bien "dotnet add package Microsoft.AspNetCore.Cors --version 2.2.0"
+    -> configurer le service puis l'ajouter le tout dans Startup.cs
+    -> activer celui ci sur les urls souhaitées dans le(s) controleurs en question
+
+
+
+
+
+
+
+
+
+
+
+20 Authentification et Autorisation d'accès à une ressource pour un utilisateur (Role/Claims/Policy) :
+    * Roles : souvent associé à un User qui a des droits ici
+    * Claims : réclamations/revendications ou propriétés d'un User, qui peut en avoir plusieurs d'ailleurs
+		- ex d'un permis de conduire contenant nom de l'autorité qui l'a attribué + date de naissance
+		-> pour entrer en discothèque, le videur vérifie votre permis dont il reconnait l'autorité ou pas puis véirifie l'âge.
+		-> si ok, vous pouvez entrer ou accéder à la ressource demandée !
+    * Policy : politique/stratégie ou fonction d'authorization	
+
+        -> Concrètement, ajouter l'annotation Authorize à une action que l'on souhaite restraindre dans HomeController 
+        - Configurer une stratégie d'authentification dans le fichier Startup/services.AddAuthentication            
+        -> à priori, vous n'avez plus accès à la ressource http://localhost:5000/Home/Secret --> http://localhost:5000/Account/Login?ReturnUrl=%2FTest%2FEx
+        -> Compléter la stratégie d'authentification en ajoutant le chemin par défaut d'authentification
+        - Nous n'avons pas accès à la page Secret parce que l'appli ne sait pas qui nous sommes / il n'y pas de cookie nous concernant
+        
+        - l'étape suivante consiste donc à créer un utilisateur ainsi que les revendications associées
+        -> ne pas oublier enfin de rajouter dans Startup "app.UseAuthentication();" avant authorization car on a besoin de savoir 
+            qui vous êtes avant de savoir si vous êtes autorisés ou pas à acceder à telle ressource
+        
+        - Il s'agit ensuite de configurer un accès à une base de donnée si ce n'est pas déjà fait (MyDbContext en mémoire ou pas)
+        -> ajouter ensuite dans Startup un service de gestion d'identité : user/role
+        - configurer un pont entre votre base de donnée et le service ou registre d'identité
+        - pour ce faire, il faut :
+            -> ajouter Microsoft.AspNetCore.Identity.EntityFrameworkCore 
+            -> puis ajouter au service "Identité" le pont vers la bdd
+            -> enfin MyDbContext doit dorénavant hériter de IdentityDbContext<IdentityUser> qui contient les tables des utilisateurs
+        - pour tester le tout, il faut :
+        -> ajouter dans votre controller une méthode Login avec user + pwd 
+        -> puis une méthode d'enregistrement
+        -> ainsi que les vues associées
+        -> injecter la dépendance userManager pour créer ou vérifier si un user existe...
+        -> injecter la dépendance signInManager pour vérif
+        -> configurer la gestion du mot de pass avec un min de contraintes
+        -> mettre entre commentaire le service d'authentification via le cookie précédemment ajouté "Grandma"
+        -> le remplacer par un autre via cette fois ConfigureApplicationCookie
+        *si ce n'est pas déjà fait => ajouter app.UseAuthentication();
+        - dorénavant http://localhost:5000/Home/Secret doit renvoyer vers votre page d'authentification "Login"
+        -> Tester en enregistrant un nouvel user + login + logout... vérifier la présence du cookie !
+        => ATTENTION : dans le cas d'une base de donnée physique, il est indispensable de mettre en oeuvre une migration pour générer de nouvelles tables
+                        -> dotnet ef migrations add "addIdMigration" (Configuration de migration) (peut être necessaire d'ajouter "dotnet tool install --global dotnet-ef")
+                        -> dotnet ef database update (pour mettre à jour la base de donnée)
+                        -> dotnet ef migrations remove pour supprimer les migrations
+                        -> lancer l'appli afin de générer les tables en conséquence
+
+NB : Il est possible d'ajouter des champs non présent dans IdentityUser, pour ce faire, ajouter une classe qui hérite de celle-ci avec les attibuts voulus en +
+Nb : F12 sur une classe de l'api pour avoir toutes les informations sur celle-ci
+
+        - Pour ajouter des roles et les associer à des utilisateurs, le processus est similaire à IdentityUser sauf que ce sera IdentityRole
+            -> une fois injecter la dépendance dans le controller visé
+            -> créer les roles 
+            -> les associer à un ou plusieurs utilisateurs
+            -> Ajouter à la ressource/view [Authorize(Roles = "User,Admin")] en fonction de..
+
+
+

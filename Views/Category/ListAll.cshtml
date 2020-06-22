@@ -1,0 +1,36 @@
+@model IEnumerable<WebApp.Model.Category>
+
+@{
+    ViewBag.title = "Liste des catégories";
+}
+
+<div class="container col-md-6 col-sm-6 col-ex-12 col-md-offset-3 spacer">
+    @foreach (var c in Model)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading">@c.Name</div>
+                <div class="panel-body">
+                    @if(c.products != null)
+                            {
+                        <table class="table table-striped">
+                            <tr>
+                                <th>ID</th><th>NAME</th><th>PRICE</th>
+                            </tr>    
+                            
+                                @foreach(var p in c.products)
+                                {
+                                    <tr>
+                                        <td>@p.Id</td>
+                                        <td>@p.name</td>
+                                        <td>@p.currentPrice</td>
+                                    </tr>
+                                }
+                            
+                        </table>
+                            }
+                </div>
+        </div>
+    }
+</div>
+
+

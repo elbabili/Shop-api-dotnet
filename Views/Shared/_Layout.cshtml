@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title> @ViewData["title"] </title>
+        <link rel="stylesheet" type="text/css" href="~/css/bootstrap.min.css"/>
+        <link rel="stylesheet" type="text/css" href="~/css/styles.css"/>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                <a class="navbar-brand" href="#">My Net Shop</a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li><a asp-area="" asp-controller="Category" asp-action="Listcat">Liste des Catégories</a></li>
+                    <li><a asp-area="" asp-controller="Category" asp-action="Listcatprod">Liste des Produits par catégories</a></li>
+                    <li><a asp-area="" asp-controller="Category" asp-action="Listprod">Liste des produits</a></li>
+                </ul>
+            </div>
+        </nav>
+                
+        <section>@RenderBody()</section>
+        <footer></footer>
+    </body>
+</html>

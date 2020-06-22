@@ -1,0 +1,15 @@
+@model WebApp.Model.Category;
+
+@{
+    ViewBag.title = "Produits par catégorie";
+}
+
+<div class="container">
+    <form method = "post">
+        <select asp-for="CategoryId" asp-items="ViewBag.categories" onchange="this.form.submit()">
+             <option selected value ="-1"> Selectionner une catégorie</option>
+        </select>
+
+    </form>
+
+</div>
